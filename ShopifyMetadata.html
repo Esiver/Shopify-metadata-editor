@@ -1,0 +1,197 @@
+<h1> Shopify Metadata Editor~!</h1>
+<h4>By Emil / 海生一</h4>
+<div class="page-container">
+    <div class="section-container" id="storecontainer">
+        <h2>State your shopify store</h2>
+        <input type="text" name="store_input" id="store_input" placeholder="mystore"><span>.myshopify.com</span>
+
+    </div>
+
+    <div class="section-container" id="typecontainer">
+        <h2>Edit Metadata For...</h2>
+        <span class="radios">
+            <span>
+                <label for="r_product">Product</label><input type="radio" name="type" id="r_product" value="Product"
+                    class="type_radio radio">
+            </span>
+            <span>
+                <label for="r_blog">Blog / Article</label><input type="radio" name="type" id="r_blog" value="Article"
+                    class="type_radio radio">
+            </span>
+            <span>
+                <label for="r_collection">Collection</label><input type="radio" name="type" id="r_collection"
+                    value="Collection" class="type_radio radio">
+            </span>
+        </span>
+        
+    </div>
+    <div id="metatypecontainer" class="section-container">
+        <h2>Choose Metadata Namespace</h2>
+        <input type="text" name="metatype" id="metatype_input" placeholder="Model, Color, VideoUrl, etc...">
+        
+    </div>
+
+    <div class="section-container" id="metavaluecontainer">
+        <h2>Chose Metadata Key <span id="value_header"></span></h2>
+        <input type="text" name="metavalue_input" id="metavalue_input" placeholder="Joey, Red, Blue, <iframe>...">
+        
+    </div>
+</div>
+
+<span class="">
+    <strong>Shopify Store: </strong><div class="chosen" id="chosen_shopify"></div>
+    <strong>Content:</strong><div class="chosen" id="chosen_type"></div>
+    <strong>Metadata Namespace</strong><div class="chosen" id="chosen_metatype"></div>
+    <strong>Metadata Key</strong><div class="chosen" id="chosen_metavalue"></div>
+</span>
+<a href="#" id="outputURL">
+
+</a>
+
+<style>
+    :root {
+        --std-margin : 5px;
+        --std-padding : 10px;
+    }
+    .page-container {
+        display: flex;
+        max-width: 800px;
+    }
+    @media screen and (max-width:800px) {
+        .page-container{
+            flex-direction: column;
+        }
+        
+    }
+
+    .section-container {
+        flex: 1;
+        padding: var(--std-padding);
+    }
+
+    .chosen {
+        max-width: 500px;
+        min-height: 1em;
+        border: 1px solid black;
+        margin: 5px;
+        padding: 5px;
+    }
+
+    .radios {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .invalid {
+        background-color: red;
+        color: white;
+    }
+
+    #outputURL {
+        font-size: 150%;
+        color: rgb(2, 80, 17);
+        text-decoration: none;
+        padding: 3px;
+        border: 1px solid currentColor;
+        position: absolute;
+        bottom: 0;
+        margin-bottom: 10%;
+    }
+</style>
+
+<script>
+    var type_radios = Array.from(document.getElementsByClassName('type_radio'))
+
+    document.getElementById('store_input').addEventListener('input', function(){
+        document.getElementById('chosen_shopify').innerHTML = document.getElementById('store_input').value
+        makeUrl();
+    })
+
+    for (let r = 0; r < type_radios.length; r++) {
+        type_radios[r].addEventListener('click', function () {
+            if (type_radios[r].checked) {
+                changeType(type_radios[r].value)
+            }
+        })
+    }
+
+    document.getElementById('metatype_input').addEventListener('input', function () {
+
+        document.getElementById('chosen_metatype').innerHTML = document.getElementById('metatype_input').value
+
+        changeMetaType()
+    })
+
+    document.getElementById('metavalue_input').addEventListener('input', function () {
+
+        document.getElementById('chosen_metavalue').innerHTML = document.getElementById('metavalue_input').value
+        changeMetaType()
+    })
+
+    function changeShopify(){
+        makeUrl()
+    }
+
+    function changeType(shopifyType) {
+        document.getElementById('chosen_type').innerHTML = shopifyType
+        makeUrl()
+    }
+
+    function changeMetaType() {
+        makeUrl()
+    }
+
+    function changeMetaValue() {
+        makeUrl()
+    }
+
+    function makeUrl() {
+
+        if (document.getElementById('chosen_shopify').innerText.length >=1) {
+            document.getElementById('storecontainer').classList.remove('invalid')
+            var store = document.getElementById('chosen_shopify').innerHTML
+        } else {
+            store = '';
+            document.getElementById('storecontainer').classList.add('invalid')
+        }
+
+        document.getElementById('outputURL').innerHTML = store +
+            '.myshopify.com/admin/bulk?resource_name=<span id="typespace"></span>&edit=metafields.<span id="metatypespace"></span>.<span id="metavaluespace"></span>'
+
+        if (document.getElementById('chosen_type').innerText.length >= 1) {
+            document.getElementById('typecontainer').classList.remove('invalid')
+            var type = document.getElementById('chosen_type').innerHTML
+        } else {
+            type = ''
+            document.getElementById('typecontainer').classList.add('invalid')
+        }
+
+        if (document.getElementById('chosen_metatype').innerText.length >= 1) {
+            document.getElementById('metatypecontainer').classList.remove('invalid')
+            var metatype = document.getElementById('chosen_metatype').innerHTML
+        } else {
+            metatype = '';
+            document.getElementById('metatypecontainer').classList.add('invalid')
+        }
+
+        if (document.getElementById('chosen_metavalue').innerText.length >= 1) {
+
+            var metavalue = document.getElementById('chosen_metavalue').innerHTML
+        } else {
+            var metavalue = '';
+            document.getElementById('metavaluecontainer').classList.add('invalid')
+        }
+
+        output = 'http://' + store +
+            '.myshopify.com/admin/bulk?resource_name=' + type +
+            '&edit=metafields.' + metatype + '.' +
+            metavalue
+
+        document.getElementById('outputURL').innerHTML = store +
+            '.myshopify.com/admin/bulk?resource_name=<span id="typespace">' + type +
+            '</span>&edit=metafields.<span id="metatypespace">' + metatype + '</span>.<span id="metavaluespace">' +
+            metavalue + '</span>'
+
+        document.getElementById('outputURL').setAttribute('href', output)
+    }
+</script>
